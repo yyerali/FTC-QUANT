@@ -15,50 +15,44 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "AutoBlue12 - 9 Pizzas", group = "Autonomous")
-@Configurable
+@Autonomous(name = "AutoBlue12 - 9 pizzas", group = "Autonomous")
+@Configurable // Panels
 public class AutoBlue12 extends OpMode {
 
-    private TelemetryManager panelsTelemetry;
-    public Follower follower;
-
-    private int pathState = 0;
-    private Paths paths;
+    private TelemetryManager panelsTelemetry; // Panels Telemetry instance
+    public Follower follower; // Pedro Pathing follower instance
+    private int pathState; // Current autonomous path state (state machine)
+    private Paths paths; // Paths defined in the Paths class
 
     @Override
     public void init() {
-
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
 
-        // Starting pose set by you
-        follower.setStartingPose(new Pose(48, 96, Math.toRadians(135)));
+        // Updated starting pose to (72, 8) with a 90-degree heading (straight up)
+        follower.setStartingPose(new Pose(72, 8, Math.toRadians(90)));
 
-        paths = new Paths(follower);
+        paths = new Paths(follower); // Build paths
 
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
     }
 
-    @Override
-    public void start() {
-        follower.followPath(paths.Path0);
-        pathState = 0;
-    }
+    // The start() method is intentionally removed.
+    // The first path should be initiated from inside the autonomousPathUpdate() state machine
+    // in your custom logic.
 
     @Override
     public void loop() {
+        follower.update(); // Update Pedro Pathing
+        pathState = autonomousPathUpdate(); // Update autonomous state machine
 
-        follower.update();
-
-        pathState = autonomousPathUpdate();
-
+        // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
         panelsTelemetry.debug("X", follower.getPose().getX());
         panelsTelemetry.debug("Y", follower.getPose().getY());
         panelsTelemetry.debug("Heading", follower.getPose().getHeading());
-
         panelsTelemetry.update(telemetry);
     }
 
@@ -68,7 +62,7 @@ public class AutoBlue12 extends OpMode {
 
     public static class Paths {
 
-        public PathChain Path0;
+        // Path0 removed as per request
         public PathChain Path1;
         public PathChain Path2;
         public PathChain Path3;
@@ -82,26 +76,13 @@ public class AutoBlue12 extends OpMode {
         public Paths(Follower follower) {
 
             // ------------------------------------------------------
-            // Path0 — initial move from starting pose to first pose
-            // ------------------------------------------------------
-            Path0 = follower
-                    .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(72, 8),
-                            new Pose(48.000, 96.000)
-                    ))
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
-                    .build();
-
-            // ------------------------------------------------------
             // Path1
             // ------------------------------------------------------
             Path1 = follower
                     .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(48.000, 96.000),
-                            new Pose(60.000, 84.000)
-                    ))
+                    .addPath(
+                            new BezierLine(new Pose(48.000, 96.000), new Pose(60.000, 84.000))
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
                     .build();
 
@@ -110,10 +91,9 @@ public class AutoBlue12 extends OpMode {
             // ------------------------------------------------------
             Path2 = follower
                     .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(60.000, 84.000),
-                            new Pose(18.707, 83.746)
-                    ))
+                    .addPath(
+                            new BezierLine(new Pose(60.000, 84.000), new Pose(18.707, 83.746))
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
@@ -122,10 +102,9 @@ public class AutoBlue12 extends OpMode {
             // ------------------------------------------------------
             Path3 = follower
                     .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(18.707, 83.746),
-                            new Pose(60.000, 84.000)
-                    ))
+                    .addPath(
+                            new BezierLine(new Pose(18.707, 83.746), new Pose(60.000, 84.000))
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
                     .build();
 
@@ -134,11 +113,13 @@ public class AutoBlue12 extends OpMode {
             // ------------------------------------------------------
             Path4 = follower
                     .pathBuilder()
-                    .addPath(new BezierCurve(
-                            new Pose(60.000, 84.000),
-                            new Pose(52.640, 54.816),
-                            new Pose(18.707, 59.601)
-                    ))
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(60.000, 84.000),
+                                    new Pose(52.640, 54.816),
+                                    new Pose(18.707, 59.601)
+                            )
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
@@ -147,34 +128,31 @@ public class AutoBlue12 extends OpMode {
             // ------------------------------------------------------
             Path5 = follower
                     .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(18.707, 59.601),
-                            new Pose(18.272, 70.477)
-                    ))
+                    .addPath(
+                            new BezierLine(new Pose(18.707, 59.601), new Pose(18.272, 70.477))
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
             // ------------------------------------------------------
-            // Path6
+            // Path6 (Updated coordinates per request)
             // ------------------------------------------------------
             Path6 = follower
                     .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(18.272, 70.477),
-                            new Pose(14.574, 70.695)
-                    ))
-                    .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(90))
+                    .addPath(
+                            new BezierLine(new Pose(18.272, 70.477), new Pose(12.181, 70.477))
+                    )
+                    .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
                     .build();
 
             // ------------------------------------------------------
-            // Path7
+            // Path7 (Start coordinate updated to match new Path6 end)
             // ------------------------------------------------------
             Path7 = follower
                     .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(14.574, 70.695),
-                            new Pose(60.000, 84.000)
-                    ))
+                    .addPath(
+                            new BezierLine(new Pose(12.181, 70.477), new Pose(60.000, 84.000))
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(90), Math.toRadians(135))
                     .build();
 
@@ -183,11 +161,13 @@ public class AutoBlue12 extends OpMode {
             // ------------------------------------------------------
             Path8 = follower
                     .pathBuilder()
-                    .addPath(new BezierCurve(
-                            new Pose(60.000, 84.000),
-                            new Pose(55.686, 29.583),
-                            new Pose(18.707, 35.674)
-                    ))
+                    .addPath(
+                            new BezierCurve(
+                                    new Pose(60.000, 84.000),
+                                    new Pose(55.686, 29.583),
+                                    new Pose(18.707, 35.674)
+                            )
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
                     .build();
 
@@ -196,10 +176,9 @@ public class AutoBlue12 extends OpMode {
             // ------------------------------------------------------
             Path9 = follower
                     .pathBuilder()
-                    .addPath(new BezierLine(
-                            new Pose(18.707, 35.674),
-                            new Pose(60.000, 84.000)
-                    ))
+                    .addPath(
+                            new BezierLine(new Pose(18.707, 35.674), new Pose(60.000, 84.000))
+                    )
                     .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
                     .build();
         }
@@ -209,55 +188,9 @@ public class AutoBlue12 extends OpMode {
     //                       AUTONOMOUS STATE MACHINE
     // --------------------------------------------------------------------
     public int autonomousPathUpdate() {
-
-        if (!follower.isBusy()) {
-
-            switch (pathState) {
-
-                case 0:
-                    follower.followPath(paths.Path1);
-                    break;
-
-                case 1:
-                    follower.followPath(paths.Path2);
-                    break;
-
-                case 2:
-                    follower.followPath(paths.Path3);
-                    break;
-
-                case 3:
-                    follower.followPath(paths.Path4);
-                    break;
-
-                case 4:
-                    follower.followPath(paths.Path5);
-                    break;
-
-                case 5:
-                    follower.followPath(paths.Path6);
-                    break;
-
-                case 6:
-                    follower.followPath(paths.Path7);
-                    break;
-
-                case 7:
-                    follower.followPath(paths.Path8);
-                    break;
-
-                case 8:
-                    follower.followPath(paths.Path9);
-                    break;
-
-                case 9:
-                    // Done
-                    break;
-            }
-
-            pathState++;
-        }
-
+        // Add your state machine Here
+        // Access paths with paths.pathName
+        // Refer to the Pedro Pathing Docs (Auto Example) for an example state machine
         return pathState;
     }
 }
